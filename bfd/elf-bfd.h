@@ -754,6 +754,8 @@ typedef asection * (*elf_gc_mark_hook_fn)
   (asection *, struct bfd_link_info *, Elf_Internal_Rela *,
    struct elf_link_hash_entry *, Elf_Internal_Sym *);
 
+struct bfd_elf_section_reloc_data;
+
 struct elf_backend_data
 {
   /* The architecture for this backend.  */
@@ -1166,6 +1168,11 @@ struct elf_backend_data
     (bfd *, asection *, Elf_Internal_Shdr *, Elf_Internal_Rela *,
      struct elf_link_hash_entry **);
 
+  /* Update relocations.  It is allowed to change the number and the order.
+     In such a case hashes should be invalidated.  */
+  void (*elf_backend_update_relocs)
+    (asection *, struct bfd_elf_section_reloc_data *);
+
   /* Count relocations.  Not called for relocatable links
      or if all relocs are being preserved in the output.  */
   unsigned int (*elf_backend_count_relocs)
@@ -1175,11 +1182,6 @@ struct elf_backend_data
      additional relocations needs to be created.  */
   unsigned int (*elf_backend_count_additional_relocs)
     (asection *);
-
-  /* Count relocations to be output.  The result may be different if the
-     input relocations are expected to be modified by the backend.  */
-  unsigned int (* elf_backend_count_output_relocs)
-    (struct bfd_link_info *, asection *, bfd_boolean is_rela);
 
   /* Say whether to sort relocs output by ld -r and ld --emit-relocs,
      by r_offset.  If NULL, default to true.  */
@@ -2147,9 +2149,6 @@ extern Elf_Internal_Rela *_bfd_elf_link_read_relocs
 extern bfd_boolean _bfd_elf_link_output_relocs
   (bfd *, asection *, Elf_Internal_Shdr *, Elf_Internal_Rela *,
    struct elf_link_hash_entry **);
-
-extern unsigned int _bfd_elf_default_count_output_relocs
-  (struct bfd_link_info * ATTRIBUTE_UNUSED, asection *, bfd_boolean);
 
 extern bfd_boolean _bfd_elf_adjust_dynamic_copy
   (struct bfd_link_info *, struct elf_link_hash_entry *, asection *);
