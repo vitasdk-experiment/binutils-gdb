@@ -554,6 +554,8 @@ cat <<EOF
   ${CREATE_SHLIB+${RELOCATING+. = ${SHLIB_DATA_ADDR-${DATA_SEGMENT_ALIGN}};}}
   ${CREATE_PIE+${RELOCATING+. = ${SHLIB_DATA_ADDR-${DATA_SEGMENT_ALIGN}};}}
 
+  /* Hacky hackity hack. Need this because otherwise data segment is not aligned enough. */
+  . = ALIGN(0x10000);
   /* Exception handling  */
   .eh_frame     ${RELOCATING-0} : ONLY_IF_RW { KEEP (*(.eh_frame)) ${RELOCATING+*(.eh_frame.*)} }
   .gnu_extab    ${RELOCATING-0} : ONLY_IF_RW { *(.gnu_extab) }
